@@ -1892,8 +1892,116 @@ const __PREF=['office','house','pac','pres','senate','gov','other_pac','outside_
 const ORDER=[...__PREF.filter(k=>E[k]),...Object.keys(E).filter(k=>!__PREF.includes(k))];
 
 // ── MEMBER ROSTER (declared early to avoid TDZ) ──
-var ACTIVE_MEMBER='swalwell';
+var ACTIVE_MEMBER=(function(){var b=new URLSearchParams(location.search).get('member');return (!b||b==='S001193')?'swalwell':b;})();
 var MEMBER_ROSTER=[
+  {
+    slug:'B001324',
+    name:'Wesley Bell',
+    initials:'WB',
+    state:'MO', district:'1', party:'D', partyFull:'Democrat',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$7.6M',
+    flagCount:1, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
+  {
+    slug:'C001067',
+    name:'Yvette D. Clarke',
+    initials:'YC',
+    state:'NY', district:'9', party:'D', partyFull:'Democrat',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$24.5M',
+    flagCount:11, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
+  {
+    slug:'D000594',
+    name:'Monica De La Cruz',
+    initials:'MD',
+    state:'TX', district:'15', party:'R', partyFull:'Republican',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$20.3M',
+    flagCount:8, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
+  {
+    slug:'D000399',
+    name:'Lloyd Doggett',
+    initials:'LD',
+    state:'TX', district:'37', party:'D', partyFull:'Democrat',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$25.7M',
+    flagCount:8, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
+  {
+    slug:'F000484',
+    name:'Randy Fine',
+    initials:'RF',
+    state:'FL', district:'6', party:'R', partyFull:'Republican',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$4.0M',
+    flagCount:1, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
+  {
+    slug:'K000391',
+    name:'Raja Krishnamoorthi',
+    initials:'RK',
+    state:'IL', district:'8', party:'D', partyFull:'Democrat',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$52.2M',
+    flagCount:9, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
+  {
+    slug:'L000598',
+    name:'Nick LaLota',
+    initials:'NL',
+    state:'NY', district:'1', party:'R', partyFull:'Republican',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$11.8M',
+    flagCount:6, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
+  {
+    slug:'N000026',
+    name:'Troy E. Nehls',
+    initials:'TN',
+    state:'TX', district:'22', party:'R', partyFull:'Republican',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$13.2M',
+    flagCount:10, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
+  {
+    slug:'R000610',
+    name:'Guy Reschenthaler',
+    initials:'GR',
+    state:'PA', district:'14', party:'R', partyFull:'Republican',
+    congress:'119th',
+    statusLabel:'Sitting member',
+    totalUniverse:'$23.4M',
+    flagCount:8, highFlags:0,
+    prudenceFindings:5,
+    hasData:true
+  },
   {
     slug:'swalwell',
     name:'Eric Swalwell',
@@ -1901,13 +2009,12 @@ var MEMBER_ROSTER=[
     state:'CA', district:'14', party:'D', partyFull:'Democrat',
     congress:'119th',
     statusLabel:'Left 119th Congress · Apr 2026',
-    totalUniverse:'$18.4M',
-    flagCount:9, highFlags:2,
+    totalUniverse:'$46.8M',
+    flagCount:9, highFlags:0,
     prudenceFindings:16,
-    hasData:true,
-    dataVar:'SWALWELL_DATA'
-  }
-  // Future members: add entry here + matching data JS file + prudence-[slug] div
+    hasData:true
+  },
+  // Active/live members (sample_members_10.json). Add a member: new entry + members/<bioguide>/data.js
 ];
 
 // ── state ──
@@ -4057,29 +4164,8 @@ function renderRoster(){
 function selectMember(slug){
   const m=MEMBER_ROSTER.find(x=>x.slug===slug);
   if(!m||!m.hasData)return;
-  ACTIVE_MEMBER=slug;
-
-  // Update nav brand
-  const firstName=m.name.split(' ')[0], lastName=m.name.split(' ').pop();
-  if(document.getElementById('navMark'))document.getElementById('navMark').textContent=m.initials;
-  if(document.getElementById('navTitle'))document.getElementById('navTitle').textContent=m.name;
-  if(document.getElementById('navSub'))document.getElementById('navSub').textContent=`${m.state}-${m.district} · ${m.party} · ${m.congress} Congress`;
-  // Update platform bar
-  if(document.getElementById('platformAvatar'))document.getElementById('platformAvatar').textContent=m.initials;
-  if(document.getElementById('platformMemberName'))document.getElementById('platformMemberName').textContent=lastName;
-  const ctx=document.querySelector('.platform-context');
-  if(ctx)ctx.innerHTML=`Political Intelligence OS &nbsp;·&nbsp; <strong>${m.state}-${m.district} Profile</strong>`;
-  // Update member pill in nav
-  const pill=document.getElementById('memberPill');
-  if(pill)pill.innerHTML=`<div class="av">${m.initials}</div><div class="nm">${m.name}</div><div class="ds">${m.state}-${m.district}</div>`;
-
-  // Show this member's Prudence content, hide others
-  document.querySelectorAll('.prudence-member-content').forEach(el=>el.classList.remove('active'));
-  const pc=document.getElementById('prudence-'+slug);
-  if(pc)pc.classList.add('active');
-
-  closeRoster();
-  showPage('overview',document.querySelector('.nav-tab[data-p=overview]'));
+  // Members load via the ?member= URL param + reload (see the loader at top of <body>).
+  const u=new URL(location.href); u.searchParams.set('member',slug); location.href=u.toString();
 }
 </script>
 </body>
