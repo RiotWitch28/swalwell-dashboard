@@ -1937,8 +1937,13 @@ function buildYrPills(){
   const span=memberSpan();
   if(span){
     const[lo,hi]=span;
+    // Does any entity have spending in this 2-year window? Skip cycles with none so
+    // a member with a gap in their record (e.g. a stray early year) never produces a
+    // pill that reads $0 across every box and chart.
+    const hasData=s=>Object.keys(E).some(k=>{const by=E[k].by_year||{};return ((by[s]||0)+(by[s+1]||0))>0;});
     let start=lo%2?lo:lo-1;               // align cycle start to the odd year
     for(let s=start;s<=hi;s+=2){
+      if(!hasData(s))continue;
       const e=s+1,key=s+'-'+e;
       html+='<div class="fpill f-yr'+(ST.yr===key?' active':'')+'" data-yr="'+key+'">'+s+'–'+String(e).slice(2)+'</div>';
     }
